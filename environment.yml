@@ -1,0 +1,12 @@
+name: nws-marine-forecast-api
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - dateparser
+  - python >=3.10
+  #- pytz
+  - uvicorn
+  - gunicorn
+  - fastapi
+  - requests

@@ -1,0 +1,10 @@
+README.md
+.git
+.gitignore
+.dockerignore
+docker-compose
+__pycache__
+*.swp
+environment-dev.yml
+test
+test_api.py
