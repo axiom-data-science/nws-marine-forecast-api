@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import os
+import re
 
 import dateparser
 import pytz
@@ -39,6 +40,24 @@ async def get_forecast(request: Request, zone: str) -> dict:
     return parse_remote_forecast(zone)
 
 
+def getSynopsis(productText: str) -> str:
+    SYNOPSIS_PATTERN = r"synopsis for([\s\S]*?)\$\$"
+
+    # Get the first substring that matches the synopsis pattern
+    synopsis_search = re.search(
+        SYNOPSIS_PATTERN, productText, re.IGNORECASE
+    )
+
+    if synopsis_search:
+        synopsis = synopsis_search.group(1)
+        # Split the synopsis by either '...' or '\n' and join the remaining parts
+        match = " ".join(re.split(r"\.\.\.|\n", synopsis)[1:]).strip()
+    else:
+        match = ""
+
+    return match
+
+
 def get_remote_forecast(zone: str) -> dict:
     forecasts_url = (
         f'https://api.weather.gov/products/types/CWF/locations/{zone}'
@@ -73,6 +92,9 @@ def parse_forecast(upstream_forecast: dict) -> dict:
     # remove preamble section from start of forecast, removing blank lines
     preamble = [line.strip() for line in forecast_chunks.pop(0).splitlines()
                 if line.strip() and line.strip() != '000']
+
+    # Extract the synopsis from the product text
+    synopsis = getSynopsis(upstream_forecast['productText'])
 
     forecasts = []
     unprocessed_chunks = []
@@ -172,6 +194,7 @@ def parse_forecast(upstream_forecast: dict) -> dict:
 
     region_forecast = {
         'preamble': '\n'.join(preamble),
+        'short_synopsis': synopsis,
         'forecasts': forecasts,
         'unprocessed': unprocessed_chunks
     }
