@@ -41,19 +41,25 @@ async def get_forecast(request: Request, zone: str) -> dict:
 
 
 def get_synopsis(product_text: str) -> str:
-    SYNOPSIS_PATTERN = r"synopsis for([\s\S]*?)\$\$"
+    SYNOPSIS_PATTERN = r"synopsis([\s\S]*?)\$\$"
 
     # Get the first substring that matches the synopsis pattern
     synopsis_search = re.search(
         SYNOPSIS_PATTERN, product_text, re.IGNORECASE
     )
 
+    match = ""
     if synopsis_search:
         synopsis = synopsis_search.group(1)
-        # Split the synopsis by either '...' or '\n' and join the remaining parts
-        match = " ".join(re.split(r"\.\.\.|\n", synopsis)[1:]).strip()
-    else:
-        match = ""
+
+        # Sometimes the synopsis doesn't begin/end with `...` so we should assume it ends
+        # with the first line break if we do not see bounding `...`
+        if len(synopsis.split("...")) > 1:
+            match = " ".join(re.split(r"\.\.\.", synopsis)[1:])
+        elif len(synopsis.split("\n")) > 1:
+            match = " ".join(re.split(r"\n", synopsis)[1:])
+
+    match = match.replace("\n", " ").strip()
 
     return match
 
