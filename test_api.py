@@ -58,8 +58,6 @@ def _test_region_forecast(region_forecast):
     assert region_forecast["preamble"]
 
     if "synopsis" in region_forecast["preamble"].lower():
-        if not region_forecast["short_synopsis"]:
-            print(region_forecast["preamble"])
         assert region_forecast["short_synopsis"]
 
     for forecast in region_forecast["forecasts"]:
