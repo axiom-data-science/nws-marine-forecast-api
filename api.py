@@ -59,7 +59,9 @@ def get_synopsis(product_text: str) -> str:
         elif len(synopsis.split("\n")) > 1:
             match = " ".join(re.split(r"\n", synopsis)[1:])
 
+    # Remove any newlines and extra spaces
     match = match.replace("\n", " ").strip()
+    match = " ".join(match.split())
 
     return match
 
