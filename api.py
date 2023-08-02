@@ -40,12 +40,12 @@ async def get_forecast(request: Request, zone: str) -> dict:
     return parse_remote_forecast(zone)
 
 
-def getSynopsis(productText: str) -> str:
+def get_synopsis(product_text: str) -> str:
     SYNOPSIS_PATTERN = r"synopsis for([\s\S]*?)\$\$"
 
     # Get the first substring that matches the synopsis pattern
     synopsis_search = re.search(
-        SYNOPSIS_PATTERN, productText, re.IGNORECASE
+        SYNOPSIS_PATTERN, product_text, re.IGNORECASE
     )
 
     if synopsis_search:
@@ -94,7 +94,7 @@ def parse_forecast(upstream_forecast: dict) -> dict:
                 if line.strip() and line.strip() != '000']
 
     # Extract the synopsis from the product text
-    synopsis = getSynopsis(upstream_forecast['productText'])
+    synopsis = get_synopsis(upstream_forecast['productText'])
 
     forecasts = []
     unprocessed_chunks = []
